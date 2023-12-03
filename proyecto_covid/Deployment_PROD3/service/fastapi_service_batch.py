@@ -141,7 +141,7 @@ def predict_via_gRPC_batch(images_to_predict, model_name, model_version, port):
     result_predict = str(stub.Predict(request, request_timeout))
     print("\nresult_predict:", result_predict)
 
-    num_classes = 5
+    num_classes = 3
     values = result_predict.split('float_val:')[1:len(images_to_predict) * num_classes + 1]
 
     predictions = []
