@@ -70,7 +70,7 @@ async def predict(files: List[UploadFile] = File(...)):
     # If we have at least one valid image
     if len(tmpfiles) > 0:
         # model
-        model_name = 'flowers'
+        model_name = 'covid'
         model_version = '1'
         port_gRPC = '9500'
 
@@ -134,7 +134,8 @@ def predict_via_gRPC_batch(images_to_predict, model_name, model_version, port):
     request.model_spec.name = model_name
     request.model_spec.version.value = model_version
     request.model_spec.signature_name = "serving_default"
-    request.inputs['vgg16_input'].CopyFrom(tf.make_tensor_proto(image_data_batch, shape=image_data_batch.shape))
+    request.inputs['keras_layer_input'].CopyFrom(tf.make_tensor_proto(image_data_batch, shape=image_data_batch.shape))
+
 
     # Send request
     result_predict = str(stub.Predict(request, request_timeout))
