@@ -7,9 +7,9 @@ services:
       - 9500:8500
       - 9501:8501
     volumes:
-      - ${MODEL_PB}:/models/model
+      - ${MODEL_PB}:/models/covid
     environment:
-      - MODEL_NAME=model
+      - MODEL_NAME=covid
     deploy:
       replicas: 4
     command:
