@@ -40,12 +40,43 @@ def main_page():
 @app.get("/form")
 async def main():
     content = """
-<body>
-<form action="/model/predict/" enctype="multipart/form-data" method="post">
-<input name="files" type="file" multiple accept=".jpg,.jpeg,.png">
-<input type="submit">
-</form>
-</body>
+    <html>
+    <head>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                text-align: center;
+                margin: 50px;
+            }
+            form {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            table {
+                border-collapse: collapse;
+                width: 50%;
+                margin-top: 20px;
+            }
+            th, td {
+                border: 1px solid #dddddd;
+                text-align: left;
+                padding: 8px;
+            }
+            th {
+                background-color: #f2f2f2;
+            }
+        </style>
+    </head>
+    <body>
+        <form action="/model/predict/" enctype="multipart/form-data" method="post">
+            <input name="files" type="file" multiple accept=".jpg,.jpeg,.png">
+            <br>
+            <br>
+            <input type="submit">
+        </form>
+    </body>
+    </html>
     """
     return HTMLResponse(content=content)
 
@@ -98,7 +129,58 @@ async def predict(files: List[UploadFile] = File(...)):
             # Success
             data["success"] = True
 
-    return data
+    # HTML response
+    content = """
+    <html>
+    <head>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                text-align: center;
+                margin: 50px;
+            }
+            table {
+                border-collapse: collapse;
+                width: 50%;
+                margin: 20px auto;
+            }
+            th, td {
+                border: 1px solid #dddddd;
+                text-align: left;
+                padding: 8px;
+            }
+            th {
+                background-color: #f2f2f2;
+            }
+        </style>
+    </head>
+    <body>
+        <h2>Predictions</h2>
+        <table>
+            <tr>
+                <th>Image</th>
+                <th>Label</th>
+                <th>Score</th>
+            </tr>
+    """
+
+    for prediction in data["predictions"]:
+        content += f"""
+            <tr>
+                <td>{prediction["image"]}</td>
+                <td>{prediction["label"]}</td>
+                <td>{prediction["score"]}</td>
+            </tr>
+        """
+
+    content += """
+        </table>
+    </body>
+    </html>
+    """
+
+    return HTMLResponse(content=content)
+
 
 def predict_via_gRPC_batch(images_to_predict, model_name, model_version, port):
     import grpc
@@ -136,7 +218,6 @@ def predict_via_gRPC_batch(images_to_predict, model_name, model_version, port):
     request.model_spec.signature_name = "serving_default"
     request.inputs['keras_layer_input'].CopyFrom(tf.make_tensor_proto(image_data_batch, shape=image_data_batch.shape))
 
-
     # Send request
     result_predict = str(stub.Predict(request, request_timeout))
     print("\nresult_predict:", result_predict)
@@ -156,6 +237,5 @@ def predict_via_gRPC_batch(images_to_predict, model_name, model_version, port):
 
 
 def divide_chunks(l, n):
-    # looping till length l
     for i in range(0, len(l), n):
         yield l[i:i + n]
