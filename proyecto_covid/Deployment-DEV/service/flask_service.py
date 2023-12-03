@@ -73,7 +73,7 @@ def predict():
             test_image = image.img_to_array(image_to_predict)
             test_image = np.expand_dims(test_image, axis=0)
             test_image = test_image.astype('float32')
-            test_image /= 255.0
+          
 
             predictions = loaded_model.predict(test_image)[0]
             index = np.argmax(predictions)

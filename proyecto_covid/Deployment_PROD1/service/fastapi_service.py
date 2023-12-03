@@ -72,7 +72,7 @@ def predict_via_HTTP(image_to_predict, model_name, model_version, port):
     test_image = image.img_to_array(test_image)
     test_image = np.expand_dims(test_image, axis=0)
     test_image = test_image.astype('float32')
-    test_image /= 255.0
+  
 
     data = json.dumps({"signature_name": "serving_default", "instances": test_image.tolist()})
     headers = {"content-type": "application/json"}
